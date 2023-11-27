@@ -56,8 +56,8 @@ void MatrixMult(float *M1, float *M2, float *Mout, int n){
 
 
 int main() {
-	int n=2;
-	int p=2;
+	int n=8;
+	int p=8;
 	
 	float *M1 = (float *)malloc(n*p*sizeof(float));
 	float *M2 = (float *)malloc(n*p*sizeof(float));
