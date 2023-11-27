@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
+#include <assert.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
+#define BLOCK_SIZE 1
 
 
 
@@ -41,6 +46,21 @@ void MatrixAdd(float *M1, float *M2, float *Mout, int n, int p){
 }
 
 
+//Addition de deux matrices sur GPU
+__global__ void cudaMatrixAdd(float *d_M1, float *d_M2, float *d_Mout, int n, int p){
+int i = blockIdx.x;
+int j = threadIdx.x;
+
+float d_M1_ct = *(d_M1+i*p+j);
+float d_M2_ct = *(d_M2+i*p+j);
+float d_Mout_ct = d_M1_ct + d_M2_ct;
+
+*(d_Mout+i*p+j)=d_Mout_ct;
+	
+}
+
+
+
 //Multiplication de deux matrices sur CPU
 void MatrixMult(float *M1, float *M2, float *Mout, int n){
 	for(int i=0;i<n;i++){
@@ -54,20 +74,41 @@ void MatrixMult(float *M1, float *M2, float *Mout, int n){
 	}
 }
 
+__global__ void cudaMatrixMult(float *d_M1, float *d_M2, float *d_Mout, int n) 
+{
+int i = blockIdx.x;
+int j = threadIdx.x;
+*(d_Mout+i*n+j)=0;
+for(int k = 0; k<n;k++)
+{
+	float d_M1_ct = *(d_M1+i*n+k);
+	float d_M2_ct = *(d_M2+k*n+j);
+	float d_Mout_ct = d_M1_ct*d_M2_ct;
+	*(d_Mout+i*n+j)=d_Mout_ct;
+	
+}
+}
+
+
+
 
 int main() {
-	int n=8;
+	int n=100;
 	int p=8;
 	
 	float *M1 = (float *)malloc(n*p*sizeof(float));
 	float *M2 = (float *)malloc(n*p*sizeof(float));
 	float *Moutadd = (float *)malloc(n*p*sizeof(float));
-	float *Moutmult = (float *)malloc(n*p*sizeof(float));
+	float *Moutadd_gpu = (float *)malloc(n*p*sizeof(float));
+	float *Moutmult = (float *)malloc(n*n*sizeof(float));
+	float *Moutmult_gpu = (float *)malloc(n*n*sizeof(float));
 	
 	MatrixInit(M1,n,p);
 	MatrixInit(M2,n,p);
 	MatrixInit(Moutadd,n,p);
 	MatrixInit(Moutmult,n,p);
+	MatrixInit(Moutadd_gpu,n,p);
+	MatrixInit(Moutmult_gpu,n,p);
 	
 	printf("Matrix M1: \n");
 	MatrixPrint(M1,n,p);
@@ -83,4 +124,9 @@ int main() {
 	printf("\n\n");
 	printf("Matrix M1*M2: \n");
 	MatrixPrint(Moutmult,n,n);
+	printf("\n\n");
+
+	cudaMatrixMult<<<n*n,1>>>(M1,M2,Moutmult_gpu,n);
+	MatrixPrint(Moutmult_gpu,n,n);
+	printf("\n\n");
 }
