@@ -1,5 +1,4 @@
-# HSP_SIA_ENSEA
-## CNN Implementation on GPU
+# CNN Implementation on GPU
 
 Our goal is to implement the very famous LeNet-5 CNN on GPU using Cuda. 
 
@@ -12,17 +11,47 @@ Then it's important to understand a CNN structure and so code the mandatory func
 - [Project follow-up](#progression-and-work-done-during-this-project)
 - [How to run the code](#how-to-run-the-code)
 
-## Progression and work done during this project
-### Step 1: Learning CUDA
+# Progression and work done during this project
+## Part 0 : Objectives
 
-Because it's a CUDA project, it seems important to learn how we can compile a function on a NVIDIA GPU - which is the specificity of CUDA - and not only on CPU as all the code written until now. 
+### Elem 1: Learning CUDA
+Because it's a CUDA project, it seems important to learn how we can compile a function on a NVIDIA GPU - which is the specificity of CUDA - and not only on CPU as all the code written until now. The most important point is to learn how to parallelize tasks dealing with blocks and threads.
 
+### Elem 2: Study algorithm complexity and GPU acceleration
+Understand the advantages of using a GPU to execute complex algorithms or very high-dimensional calculations.
 
+### Elem 3: Discuss the limitations of CPU/GPU
+Involves observing the limits of using a GPU, including data size, algorithm complexity and resource availability.
 
+### Elem 4: Implement CNN on GPU
+Involves implementing a CNN, a type of Deep Learning algorithm commonly used for computer vision.
 
+## Part 1 : Dealing with CUDA, Matrix Multiplication
 
+### Sub-part 1.1 : 
 
+### Sub-part 1.2 :
 
+### Sub-part 1.3 :
 
+## Part 2 : First layers of our CNN, convolution and subsampling
 
-## How to run the code
+### Sub-part 2.1 :
+
+### Sub-part 2.2 :
+
+### Sub-part 2.3 :
+
+### Sub-part 2.4 :
+
+### Sub-part 2.5 :
+
+## Part 3 : Using Python to import the weights
+
+### Sub-part 3.1 : Generating weights
+
+### Sub-part 3.2 : Missing functions ? 
+
+### Sub-part 3.3 : Putting everything together
+
+# How to run the code
