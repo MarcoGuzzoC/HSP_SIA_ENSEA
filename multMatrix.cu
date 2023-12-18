@@ -7,19 +7,18 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define BLOCK_SIZE 1
-
-
 
 //Création d'une matrice sur CPU
-void MatrixInit(float *M, int n, int p){
+void MatrixInit(float *M, int n, int p, int q){
 	// srand(time(NULL));
-	for (int i =0; i<n; i++){
-		for (int j =0; j<p; j++){
-			float nbr = rand();
-			float rdVal = nbr/RAND_MAX;
-			rdVal = 2*rdVal -1;
-			*(M+i*p+j)=rdVal;
+	for(int h=0;h<q;h++){
+		for (int i =0; i<n; i++){
+			for (int j =0; j<p; j++){
+				float nbr = rand();
+				float rdVal = nbr/RAND_MAX;
+				rdVal = 2*rdVal -1;
+				*(M+i*p+j)=rdVal;
+			}
 		}
 	}
 }
@@ -43,14 +42,16 @@ void Init2(float *M, int N){
 
 
 //Affichage d'une matrice sur CPU
-void MatrixPrint(float *M, int n, int p){
+void MatrixPrint(float *M, int n, int p, int q){
+	for(int h=0;h<q;h++){
 	for (int i =0; i<n; i++){
 		for (int j =0; j<p; j++){
 			printf("%.2f \t ",*(M+i*p+j));
 		}
 		printf("\n");
 	}
-
+	printf("Next \n");
+	}
 }
 
 
@@ -89,13 +90,6 @@ void MatrixMult(float *M1, float *M2, float *Mout, int n){
 	}
 }
 
-void HadamardProd(float *M1, float *M2, float *Mout, int n){
-	for(int i=0;i<n;i++){
-		for(int j=0;j<n;j++){
-			*(Mout+i*n+j) = *(M1+i*n+j)* *(M2+i*n+j);
-		}
-	}
-}
 
 __global__ void cudaMatrixMult(float *d_M1, float *d_M2, float *d_Mout, int n) 
 {
@@ -125,14 +119,14 @@ if (row<n && col<n){
 }
 
 
-__global__ void cudaHadamardProd(float *M1, float *M2, float *Mout, int n) 
-{
-int row = blockIdx.y*blockDim.y+threadIdx.y;
-int col = blockIdx.x*blockDim.x+threadIdx.x;
-if (row<n && col<n){
-	Mout[row*n+col]=M1[row*n+col]*M2[row*n+col];
-	}
-}
+// __global__ void cudaHadamardProd(float *M1, float *M2, float *Mout, int n) 
+// {
+// int row = blockIdx.y*blockDim.y+threadIdx.y;
+// int col = blockIdx.x*blockDim.x+threadIdx.x;
+// if (row<n && col<n){
+// 	Mout[row*n+col]=M1[row*n+col]*M2[row*n+col];
+// 	}
+// }
 
 
 
@@ -169,6 +163,22 @@ Inputs:
 	}
 }
 
+__global__ void cudaConv2D(float *Mat, float *Kernel, float *Output, int Mat_size, int Kernel_size){
+
+	 int i = blockIdx.x; //32
+	 int j = blockIdx.y; //32
+	 int z = blockIdx.z; //6
+
+	 int Output_size= Mat_size-Kernel_size+1;
+	 float block_output=0;
+	 for (int l=0;l<Kernel_size;l++){
+	 	for (int k=0;k<Kernel_size;k++){
+	 		block_output += *(Mat+(i+l)*Mat_size+j+k) * *(Kernel+l*Kernel_size+k+z*Kernel_size*Kernel_size);
+	 	}
+	 }
+	 *(Output+i*Output_size+j+z*Kernel_size*Kernel_size)=block_output;
+	
+}
 
 void subsamp(float *img, float *result, int input_size, int output_size)
 {
@@ -179,12 +189,36 @@ void subsamp(float *img, float *result, int input_size, int output_size)
 			for(int k = 0; k<2 ; k++){
 				for(int l = 0; l<2 ; l++){
 					sum +=*(img + (i*2+k)*input_size+j*2+l);
-}
-}
+				}
+			}
 			*(result+i*output_size+j)=sum/4.0;
+		}
+	}
 }
+
+__device__ float activation_tanh(float M){
+	return tanh(M);
 }
+
+__global__ void cudasubsamp(float *M_in, float *M_out, int channel, int p=28, int l=14){
+	int i=blockIdx.x;
+	int a=blockIdx.y*2;
+	int b=blockIdx.z*2;
+	float num=0;
+	for (int k=0; i<2;i++){
+		for (int m=0; m<2;m++){
+			float numberOut=*(M_in+ i*p*p+(a+k)*p+(b+m));
+			num+=numberOut;
+		}
+	}
+	*(M_out+i*(l)*(l)+a/2*(l)+b/2)=activation_tanh(num/4);
 }
+
+// Define dense ()
+
+
+// Define flatten (considering displaying layer by layer row by row)
+
 
 
 
@@ -258,21 +292,87 @@ int main() {
 	float *C1_data = (float *)malloc(6*28*28*sizeof(float));
 	float *S1_data = (float *)malloc(6*14*14*sizeof(float));
 	float *C1_kernel = (float *)malloc(6*5*5*sizeof(float));
-	
+
+	float *raw_data_gpu;
+	float *C1_data_gpu;
+	float *S1_data_gpu;
+	float *C1_kernel_gpu;
+
+	dim3 gridsize1(28,28,6);
+	dim3 gridsize2(14,14,6);
+
 	Init2(raw_data,32*32);
 	zeros(C1_data,6*28*28);
 	zeros(S1_data,6*14*14);
 	Init2(C1_kernel,6*5*5);
 
-	float * input = (float *)malloc(12*12*sizeof(float));
-	float * output = (float *)malloc(6*6*sizeof(float));
+	cudaMalloc((void **)&raw_data_gpu,32*32*sizeof(float));
+	cudaMalloc((void **)&C1_data_gpu,6*28*28*sizeof(float));
+	cudaMalloc((void **)&S1_data_gpu,6*14*14*sizeof(float));
+	cudaMalloc((void **)&C1_kernel_gpu,6*5*5*sizeof(float));
 
-	MatrixInit(input, 12,12);
-	MatrixInit(input, 6,6);
+	cudaMemcpy(raw_data_gpu,raw_data,32*32*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(C1_data_gpu,C1_data,6*28*28*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(S1_data_gpu,S1_data,6*14*14*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(C1_kernel_gpu,C1_kernel,6*5*5*sizeof(float), cudaMemcpyHostToDevice);
 
-	subsamp(input, output, 12,6);
-	MatrixPrint(input, 12,12);
-	printf("\n\n");
-	MatrixPrint(output,6,6);
+
+
+	// float * input = (float *)malloc(12*12*sizeof(float));
+	// float * output = (float *)malloc(6*6*sizeof(float));
+
+	// float * test_data = (float *)malloc(32*32*sizeof(float));
+	// float * test_kernel = (float *)malloc(2*5*5*sizeof(float));
+	// float * test_output = (float *)malloc(2*28*28*sizeof(float));
+
+	// MatrixInit(test_data,32,32,1);
+	// MatrixInit(test_kernel,5,5,2);
+	// MatrixInit(test_output,28,28,2);
+
+	// MatrixInit(input, 12,12);
+	// MatrixInit(input, 6,6);
+
+	// subsamp(input, output, 12,6);
+	// MatrixPrint(input, 12,12);
+	// printf("\n\n");
+	// MatrixPrint(output,6,6);
+
+	// float *test_datagpu;
+	// float *test_kernelgpu;
+	// float *test_outgpu;
+
+
+	// cudaMalloc((void**) &test_datagpu,32*32*sizeof(float));
+	// cudaMalloc((void**) &test_kernelgpu,2*5*5*sizeof(float));
+	// cudaMalloc((void**) &test_outgpu,2*28*28*sizeof(float));
+
+	// cudaMemcpy(test_datagpu,test_data,32*32*sizeof(float), cudaMemcpyHostToDevice);
+	// cudaMemcpy(test_kernelgpu,test_kernel,2*5*5*sizeof(float), cudaMemcpyHostToDevice);
+	// cudaMemcpy(test_outgpu,test_output,2*28*28*sizeof(float), cudaMemcpyHostToDevice);
+
+	// Conv2D(test_data, test_kernel, test_output, 32, 5);
+	// MatrixPrint(test_output,28,28);
+	// printf("\n\n");
+	// printf("PreTest");
+	// printf("\n\n");
+	// cudaConv2D<<<gridsize,1>>>(test_datagpu,test_kernelgpu,test_outgpu,32,5);
+	// printf("\n\n");
+	// cudaMemcpy(test_output,test_outgpu,2*28*28*sizeof(float), cudaMemcpyDeviceToHost);
+	// MatrixPrint(test_output,28,28,2);
+
+
+	// cudaFree(test_datagpu);
+	// cudaFree(test_kernelgpu);
+	// cudaFree(test_outgpu);
+
+	// free(test_data);
+	// free(test_kernel);
+	// free(test_output);
+
+	cudaConv2D<<<gridsize1,1>>>(raw_data_gpu,C1_kernel_gpu,C1_data_gpu,28,5);
+	cudasubsamp<<<gridsize2,1>>>(C1_data_gpu,S1_data_gpu,6,28,14);
+
+
+
 
 }
