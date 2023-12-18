@@ -8,6 +8,7 @@
 #include <cuda_runtime.h>
 
 
+
 //Création d'une matrice sur CPU
 void MatrixInit(float *M, int n, int p, int q){
 	// srand(time(NULL));
@@ -222,157 +223,130 @@ __global__ void cudasubsamp(float *M_in, float *M_out, int channel, int p=28, in
 
 
 
-int main() {
-	// int n=10000;
-	// int p=10000;
+// int main() {
+// 	// int n=10000;
+// 	// int p=10000;
 	
-	// float *M1 = (float *)malloc(n*p*sizeof(float));
-	// float *M2 = (float *)malloc(n*p*sizeof(float));
-	// float *M1gpu; 
-	// float *M2gpu; 
-	// float *Moutadd = (float *)malloc(n*p*sizeof(float));
-	// float *Moutadd_gpu ;
-	// float *Moutmult = (float *)malloc(n*n*sizeof(float));
-	// float *Moutmult_gpu;
+// 	// float *M1 = (float *)malloc(n*p*sizeof(float));
+// 	// float *M2 = (float *)malloc(n*p*sizeof(float));
+// 	// float *M1gpu; 
+// 	// float *M2gpu; 
+// 	// float *Moutadd = (float *)malloc(n*p*sizeof(float));
+// 	// float *Moutadd_gpu ;
+// 	// float *Moutmult = (float *)malloc(n*n*sizeof(float));
+// 	// float *Moutmult_gpu;
 
-	// MatrixInit(M1,n,p);
-	// MatrixInit(M2,n,p);
+// 	// MatrixInit(M1,n,p);
+// 	// MatrixInit(M2,n,p);
 	
-	// MatrixInit(Moutadd,n,p);
-	// MatrixInit(Moutmult,n,n);
+// 	// MatrixInit(Moutadd,n,p);
+// 	// MatrixInit(Moutmult,n,n);
 
 	
-	// cudaMalloc((void**) &M1gpu,n*p*sizeof(float));
-	// cudaMalloc((void**) &M2gpu,n*p*sizeof(float));
-	// cudaMalloc((void**) &Moutadd_gpu,n*p*sizeof(float));
-	// cudaMalloc((void**) &Moutmult_gpu,n*n*sizeof(float));
+// 	// cudaMalloc((void**) &M1gpu,n*p*sizeof(float));
+// 	// cudaMalloc((void**) &M2gpu,n*p*sizeof(float));
+// 	// cudaMalloc((void**) &Moutadd_gpu,n*p*sizeof(float));
+// 	// cudaMalloc((void**) &Moutmult_gpu,n*n*sizeof(float));
 
-	// cudaMemcpy(M1gpu,M1,n*p*sizeof(float), cudaMemcpyHostToDevice);
-	// cudaMemcpy(M2gpu,M2,n*p*sizeof(float), cudaMemcpyHostToDevice);
-	// cudaMemcpy(Moutadd_gpu,Moutadd,n*p*sizeof(float), cudaMemcpyHostToDevice);
-	// cudaMemcpy(Moutmult_gpu,Moutmult,n*n*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(M1gpu,M1,n*p*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(M2gpu,M2,n*p*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(Moutadd_gpu,Moutadd,n*p*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(Moutmult_gpu,Moutmult,n*n*sizeof(float), cudaMemcpyHostToDevice);
 
-	// printf("Matrix M1: \n");
-	// MatrixPrint(M1,n,p);
-	// printf("\n\n");
-	// printf("Matrix M2: \n");
-	// MatrixPrint(M2,n,p);
-	// printf("\n\n");
-	// printf("Matrix M1+M2: \n");
-	// MatrixAdd(M1,M2,Moutadd,n,p);
-	// MatrixPrint(Moutadd,n,p);
+// 	// printf("Matrix M1: \n");
+// 	// MatrixPrint(M1,n,p);
+// 	// printf("\n\n");
+// 	// printf("Matrix M2: \n");
+// 	// MatrixPrint(M2,n,p);
+// 	// printf("\n\n");
+// 	// printf("Matrix M1+M2: \n");
+// 	// MatrixAdd(M1,M2,Moutadd,n,p);
+// 	// MatrixPrint(Moutadd,n,p);
 	
-	// MatrixMult(M1,M2,Moutmult,n);
-	// printf("\n\n");
-	// printf("Matrix M1*M2: \n");
-	// MatrixPrint(Moutmult,n,n);
-	// printf("\n\n");
+// 	// MatrixMult(M1,M2,Moutmult,n);
+// 	// printf("\n\n");
+// 	// printf("Matrix M1*M2: \n");
+// 	// MatrixPrint(Moutmult,n,n);
+// 	// printf("\n\n");
 	
-	// int N=4;
-	// dim3 dimBlock(N,N);
-	// dim3 dimGrid(ceil(N/16.0),ceil(N/16.0));
-	// printf("\n\n");
-	// cudaMatrixAdd<<<n*n,1>>>(M1gpu,M2gpu,Moutadd_gpu,n,n);
-	// cudaMatrixMult<<<n*n,1>>>(M1gpu,M2gpu,Moutmult_gpu,n);
-	// MatrixPrint(Moutmult_gpu,n,n);
-	// printf("\n\n");
+// 	// int N=4;
+// 	// dim3 dimBlock(N,N);
+// 	// dim3 dimGrid(ceil(N/16.0),ceil(N/16.0));
+// 	// printf("\n\n");
+// 	// cudaMatrixAdd<<<n*n,1>>>(M1gpu,M2gpu,Moutadd_gpu,n,n);
+// 	// cudaMatrixMult<<<n*n,1>>>(M1gpu,M2gpu,Moutmult_gpu,n);
+// 	// MatrixPrint(Moutmult_gpu,n,n);
+// 	// printf("\n\n");
 
 
-	// cudaFree(M1gpu);
-	// cudaFree(M2gpu);
-	// cudaFree(Moutadd_gpu);
-	// cudaFree(Moutmult_gpu);
+// 	// cudaFree(M1gpu);
+// 	// cudaFree(M2gpu);
+// 	// cudaFree(Moutadd_gpu);
+// 	// cudaFree(Moutmult_gpu);
 
-	// free(M1);
-	// free(M2);
-	// free(Moutadd);
-	// free(Moutmult);
+// 	// free(M1);
+// 	// free(M2);
+// 	// free(Moutadd);
+// 	// free(Moutmult);
 
-	float *raw_data = (float *)malloc(32*32*sizeof(float));
-	float *C1_data = (float *)malloc(6*28*28*sizeof(float));
-	float *S1_data = (float *)malloc(6*14*14*sizeof(float));
-	float *C1_kernel = (float *)malloc(6*5*5*sizeof(float));
+	
+// 	// float * input = (float *)malloc(12*12*sizeof(float));
+// 	// float * output = (float *)malloc(6*6*sizeof(float));
 
-	float *raw_data_gpu;
-	float *C1_data_gpu;
-	float *S1_data_gpu;
-	float *C1_kernel_gpu;
+// 	// float * test_data = (float *)malloc(32*32*sizeof(float));
+// 	// float * test_kernel = (float *)malloc(2*5*5*sizeof(float));
+// 	// float * test_output = (float *)malloc(2*28*28*sizeof(float));
 
-	dim3 gridsize1(28,28,6);
-	dim3 gridsize2(14,14,6);
+// 	// MatrixInit(test_data,32,32,1);
+// 	// MatrixInit(test_kernel,5,5,2);
+// 	// MatrixInit(test_output,28,28,2);
 
-	Init2(raw_data,32*32);
-	zeros(C1_data,6*28*28);
-	zeros(S1_data,6*14*14);
-	Init2(C1_kernel,6*5*5);
+// 	// MatrixInit(input, 12,12);
+// 	// MatrixInit(input, 6,6);
 
-	cudaMalloc((void **)&raw_data_gpu,32*32*sizeof(float));
-	cudaMalloc((void **)&C1_data_gpu,6*28*28*sizeof(float));
-	cudaMalloc((void **)&S1_data_gpu,6*14*14*sizeof(float));
-	cudaMalloc((void **)&C1_kernel_gpu,6*5*5*sizeof(float));
+// 	// subsamp(input, output, 12,6);
+// 	// MatrixPrint(input, 12,12);
+// 	// printf("\n\n");
+// 	// MatrixPrint(output,6,6);
 
-	cudaMemcpy(raw_data_gpu,raw_data,32*32*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(C1_data_gpu,C1_data,6*28*28*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(S1_data_gpu,S1_data,6*14*14*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(C1_kernel_gpu,C1_kernel,6*5*5*sizeof(float), cudaMemcpyHostToDevice);
+// 	// float *test_datagpu;
+// 	// float *test_kernelgpu;
+// 	// float *test_outgpu;
 
 
+// 	// cudaMalloc((void**) &test_datagpu,32*32*sizeof(float));
+// 	// cudaMalloc((void**) &test_kernelgpu,2*5*5*sizeof(float));
+// 	// cudaMalloc((void**) &test_outgpu,2*28*28*sizeof(float));
 
-	// float * input = (float *)malloc(12*12*sizeof(float));
-	// float * output = (float *)malloc(6*6*sizeof(float));
+// 	// cudaMemcpy(test_datagpu,test_data,32*32*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(test_kernelgpu,test_kernel,2*5*5*sizeof(float), cudaMemcpyHostToDevice);
+// 	// cudaMemcpy(test_outgpu,test_output,2*28*28*sizeof(float), cudaMemcpyHostToDevice);
 
-	// float * test_data = (float *)malloc(32*32*sizeof(float));
-	// float * test_kernel = (float *)malloc(2*5*5*sizeof(float));
-	// float * test_output = (float *)malloc(2*28*28*sizeof(float));
-
-	// MatrixInit(test_data,32,32,1);
-	// MatrixInit(test_kernel,5,5,2);
-	// MatrixInit(test_output,28,28,2);
-
-	// MatrixInit(input, 12,12);
-	// MatrixInit(input, 6,6);
-
-	// subsamp(input, output, 12,6);
-	// MatrixPrint(input, 12,12);
-	// printf("\n\n");
-	// MatrixPrint(output,6,6);
-
-	// float *test_datagpu;
-	// float *test_kernelgpu;
-	// float *test_outgpu;
+// 	// Conv2D(test_data, test_kernel, test_output, 32, 5);
+// 	// MatrixPrint(test_output,28,28);
+// 	// printf("\n\n");
+// 	// printf("PreTest");
+// 	// printf("\n\n");
+// 	// cudaConv2D<<<gridsize,1>>>(test_datagpu,test_kernelgpu,test_outgpu,32,5);
+// 	// printf("\n\n");
+// 	// cudaMemcpy(test_output,test_outgpu,2*28*28*sizeof(float), cudaMemcpyDeviceToHost);
+// 	// MatrixPrint(test_output,28,28,2);
 
 
-	// cudaMalloc((void**) &test_datagpu,32*32*sizeof(float));
-	// cudaMalloc((void**) &test_kernelgpu,2*5*5*sizeof(float));
-	// cudaMalloc((void**) &test_outgpu,2*28*28*sizeof(float));
+// 	// cudaFree(test_datagpu);
+// 	// cudaFree(test_kernelgpu);
+// 	// cudaFree(test_outgpu);
 
-	// cudaMemcpy(test_datagpu,test_data,32*32*sizeof(float), cudaMemcpyHostToDevice);
-	// cudaMemcpy(test_kernelgpu,test_kernel,2*5*5*sizeof(float), cudaMemcpyHostToDevice);
-	// cudaMemcpy(test_outgpu,test_output,2*28*28*sizeof(float), cudaMemcpyHostToDevice);
+// 	// free(test_data);
+// 	// free(test_kernel);
+// 	// free(test_output);
 
-	// Conv2D(test_data, test_kernel, test_output, 32, 5);
-	// MatrixPrint(test_output,28,28);
-	// printf("\n\n");
-	// printf("PreTest");
-	// printf("\n\n");
-	// cudaConv2D<<<gridsize,1>>>(test_datagpu,test_kernelgpu,test_outgpu,32,5);
-	// printf("\n\n");
-	// cudaMemcpy(test_output,test_outgpu,2*28*28*sizeof(float), cudaMemcpyDeviceToHost);
-	// MatrixPrint(test_output,28,28,2);
+// 	cudaConv2D<<<gridsize1,1>>>(raw_data_gpu,C1_kernel_gpu,C1_data_gpu,28,5);
+// 	cudasubsamp<<<gridsize2,1>>>(C1_data_gpu,S1_data_gpu,6,28,14);
 
-
-	// cudaFree(test_datagpu);
-	// cudaFree(test_kernelgpu);
-	// cudaFree(test_outgpu);
-
-	// free(test_data);
-	// free(test_kernel);
-	// free(test_output);
-
-	cudaConv2D<<<gridsize1,1>>>(raw_data_gpu,C1_kernel_gpu,C1_data_gpu,28,5);
-	cudasubsamp<<<gridsize2,1>>>(C1_data_gpu,S1_data_gpu,6,28,14);
+	
 
 
 
 
-}
+// }
