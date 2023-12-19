@@ -110,6 +110,11 @@ We can see that the most time consumming task is the data transfer between CPU a
 
 ### Sub-part 2.1 : Generating test data
 
+We create some matrices mandatory for the rest of our code :
+- `raw_data` : $32 \times 32$ matrix representing an input image initialized with some ones and zeros.
+- `C1_data` : $6 \times 28 \times 28$ matrix full of $0$ corresponding to the output of the first convolution operation.
+- `C1_kernel` : $6 \times 5 \times 5$ matrix initialized with ones and zeros 
+
 ### Sub-part 2.2 : 2D convolution
 
 ### Sub-part 2.3 : Subsampling
